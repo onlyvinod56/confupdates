@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ICREGCSD 2026</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+  background: #0d0f1a;
+  color: #e0e2f0;
+  padding-bottom: 20px;
+}
+
+/* HEADER */
+.hdr {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 14px 10px;
+  background: #13162a;
+  border-bottom: 1px solid #1e2238;
+}
+.conf-name { font-size: 1.05rem; font-weight: 700; color: #fff; }
+.conf-sub  { font-size: 0.6rem; color: #555878; margin-top: 2px; }
+.admin-btn {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 0.68rem; font-weight: 600;
+  padding: 6px 12px; border-radius: 7px;
+  border: 1px solid #2a2e4a; background: transparent; color: #7a7ea8;
+  -webkit-appearance: none;
+}
+.admin-btn svg { width: 11px; height: 11px; flex-shrink: 0; }
+.admin-bar {
+  display: none; align-items: center; gap: 5px;
+  padding: 5px 14px; font-size: 0.62rem; color: #5a6af4;
+  background: #10133a; border-bottom: 1px solid #1a1e44;
+}
+.admin-bar.show { display: flex; }
+.logout-lnk { margin-left: auto; color: #f87171; font-size: 0.62rem; text-decoration: underline; }
+
+/* PAGE */
+.page { padding: 0 12px; }
+
+/* SECTION CARD */
+.sec {
+  background: #13162a;
+  border: 1px solid #1e2238;
+  border-radius: 12px;
+  padding: 10px 11px;
+  margin-top: 10px;
+}
+.sec-title {
+  font-size: 0.72rem; font-weight: 700; color: #9094b8;
+  margin-bottom: 9px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.edit-sm {
+  font-size: 0.58rem; padding: 3px 9px; border-radius: 5px;
+  border: 1px solid #252840; background: transparent; color: #555878;
+  -webkit-appearance: none; display: none;
+}
+.edit-sm.show { display: inline-block; }
+
+/* 3-col stat */
+.stat3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.sbox {
+  background: #0d0f1a; border: 1px solid #1e2238; border-radius: 9px;
+  padding: 8px 4px 7px; text-align: center;
+}
+.sbox-lbl { font-size: 0.52rem; color: #555878; line-height: 1.4; margin-bottom: 5px; min-height: 2.2em; display: flex; align-items: center; justify-content: center; }
+.sbox-val { font-size: 1.55rem; font-weight: 700; line-height: 1; }
+.vb{color:#5a9cf8} .vr{color:#f87171} .va{color:#fbbf24}
+.vt{color:#34d399} .vg{color:#86efac} .vo{color:#fb923c}
+
+/* IQC grid */
+.iqc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.iqc-card {
+  background: #13162a; border: 1px solid #1e2238; border-radius: 11px;
+  padding: 9px 10px;
+}
+.iqc-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 2px;
+}
+.iqc-name { font-size: 0.66rem; font-weight: 700; color: #9094b8; }
+.iqc-meta { font-size: 0.5rem; color: #383b58; margin-bottom: 7px; }
+.iqc-tbl { width: 100%; border-collapse: collapse; }
+.iqc-tbl tr { border-bottom: 1px solid #1a1d30; }
+.iqc-tbl tr:last-child { border-bottom: none; }
+.iqc-tbl td { padding: 5px 2px; font-size: 0.6rem; line-height: 1; }
+.td-lbl { color: #555878; }
+.td-val { text-align: right; font-weight: 700; font-size: 0.95rem; }
+.c-acc{color:#34d399} .c-rej{color:#f87171} .c-pnd{color:#7a7ea8}
+
+/* MODAL */
+.overlay {
+  display: none; position: fixed; top:0;left:0;right:0;bottom:0;
+  background: rgba(0,0,0,0.88); z-index: 200;
+  -webkit-overflow-scrolling: touch;
+}
+.overlay.show { display: flex; align-items: center; justify-content: center; }
+.modal {
+  background: #181c2e; border: 1px solid #22263a; border-radius: 14px;
+  padding: 1.3rem; width: 88%; max-width: 300px;
+}
+.modal h3 { font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 5px; }
+.modal p  { font-size: 0.7rem; color: #555878; margin-bottom: 12px; }
+.modal input[type=password] {
+  width: 100%; background: #0d0f1a; border: 1px solid #2a2e4a;
+  border-radius: 8px; color: #e0e2f0; font-size: 1rem; padding: 10px 12px;
+  outline: none; -webkit-appearance: none;
+}
+.modal-err { font-size: 0.65rem; color: #f87171; margin-top: 6px; min-height: 18px; }
+.modal-btns { display: flex; gap: 8px; margin-top: 14px; }
+.btn-p {
+  flex: 1; background: #5a6af4; border: none; color: #fff;
+  font-size: 0.85rem; font-weight: 600; padding: 10px; border-radius: 8px;
+  -webkit-appearance: none;
+}
+.btn-s {
+  background: transparent; border: 1px solid #2a2e4a; color: #6a6e98;
+  font-size: 0.85rem; padding: 10px 14px; border-radius: 8px;
+  -webkit-appearance: none;
+}
+
+/* EDIT SHEET */
+.sheet-wrap {
+  display: none; position: fixed; top:0;left:0;right:0;bottom:0;
+  background: rgba(0,0,0,0.88); z-index: 200;
+  -webkit-overflow-scrolling: touch;
+}
+.sheet-wrap.show { display: flex; align-items: flex-end; justify-content: center; }
+.sheet {
+  background: #181c2e; border: 1px solid #22263a;
+  border-radius: 16px 16px 0 0;
+  padding: 1.2rem 1.3rem 2.5rem;
+  width: 100%; max-width: 480px;
+  max-height: 75vh; overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.sheet-title { font-size: 0.85rem; font-weight: 700; color: #9094b8; margin-bottom: 14px; }
+.er { margin-bottom: 10px; }
+.er label { font-size: 0.65rem; color: #555878; display: block; margin-bottom: 3px; }
+.er input[type=number] {
+  width: 100%; background: #0d0f1a; border: 1px solid #2a2e4a;
+  border-radius: 7px; color: #e0e2f0; font-size: 1rem; padding: 9px 11px;
+  outline: none; -webkit-appearance: none;
+}
+.save-btn {
+  width: 100%; margin-top: 12px; background: #5a6af4; border: none;
+  color: #fff; font-size: 0.85rem; font-weight: 700; padding: 11px;
+  border-radius: 8px; -webkit-appearance: none;
+}
+.cancel-btn {
+  width: 100%; margin-top: 7px; background: transparent;
+  border: 1px solid #2a2e4a; color: #555878;
+  font-size: 0.82rem; padding: 9px; border-radius: 8px;
+  -webkit-appearance: none;
+}
+</style>
+</head>
+<body>
+
+<!-- Password Modal -->
+<div class="overlay" id="pw-overlay">
+  <div class="modal">
+    <h3>🔐 Admin Login</h3>
+    <p>Enter password to edit conference data.</p>
+    <input type="password" id="pw-input" placeholder="Password">
+    <div class="modal-err" id="pw-err"></div>
+    <div class="modal-btns">
+      <button class="btn-s" id="pw-cancel">Cancel</button>
+      <button class="btn-p" id="pw-submit">Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Sheet -->
+<div class="sheet-wrap" id="sheet-wrap">
+  <div class="sheet" id="sheet-body"></div>
+</div>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div>
+    <div class="conf-name">ICREGCSD 2026</div>
+    <div class="conf-sub">11–12 Sep 2026 · CVR College of Engineering</div>
+  </div>
+  <button class="admin-btn" id="admin-btn">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="3" y="7" width="10" height="8" rx="1.5"/>
+      <path d="M5 7V5a3 3 0 0 1 6 0v2"/>
+    </svg>
+    ADMIN
+  </button>
+</div>
+<div class="admin-bar" id="admin-bar">
+  🔓 Admin mode active
+  <span class="logout-lnk" id="logout-btn">Logout</span>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- Submissions -->
+  <div class="sec">
+    <div class="sec-title">
+      Submissions
+      <button class="edit-sm" id="edit-sub-btn" data-mode="sub">✏️ Edit</button>
+    </div>
+    <div class="stat3">
+      <div class="sbox">
+        <div class="sbox-lbl">Papers<br>Received</div>
+        <div class="sbox-val vb" id="v-papers">0</div>
+      </div>
+      <div class="sbox">
+        <div class="sbox-lbl">Desk<br>Reject</div>
+        <div class="sbox-val vr" id="v-desk">0</div>
+      </div>
+      <div class="sbox">
+        <div class="sbox-lbl">Plagiarism</div>
+        <div class="sbox-val va" id="v-plag">0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reviewers -->
+  <div class="sec">
+    <div class="sec-title">
+      Reviewers
+      <button class="edit-sm" id="edit-rev-btn" data-mode="rev">✏️ Edit</button>
+    </div>
+    <div class="stat3">
+      <div class="sbox">
+        <div class="sbox-lbl">Invited</div>
+        <div class="sbox-val vt" id="v-inv">0</div>
+      </div>
+      <div class="sbox">
+        <div class="sbox-lbl">Accepted</div>
+        <div class="sbox-val vg" id="v-racc">0</div>
+      </div>
+      <div class="sbox">
+        <div class="sbox-lbl">Rejected</div>
+        <div class="sbox-val vo" id="v-rrej">0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IQC Members -->
+  <div class="iqc-grid" id="iqc-grid"></div>
+
+</div>
+
+<script>
+// ══ CONFIG ══════════════════════════════════════════════
+var PASS = "icregcsd@2026";
+
+// ══ DATA ════════════════════════════════════════════════
+var D = {
+  papers:0, desk:0, plag:0,
+  inv:0, racc:0, rrej:0,
+  iqc:[
+    {name:"IQC Member 1", assigned:0, accepted:0, rejected:0},
+    {name:"IQC Member 2", assigned:0, accepted:0, rejected:0},
+    {name:"IQC Member 3", assigned:0, accepted:0, rejected:0},
+    {name:"IQC Member 4", assigned:0, accepted:0, rejected:0}
+  ]
+};
+
+var isAdmin = false;
+
+// ══ HELPERS ═════════════════════════════════════════════
+function pend(m){ return Math.max(0, m.assigned - m.accepted - m.rejected); }
+function pct(m){  return m.assigned > 0 ? Math.round((m.accepted+m.rejected)/m.assigned*100) : 0; }
+
+// ══ RENDER ══════════════════════════════════════════════
+function render() {
+  document.getElementById('v-papers').textContent = D.papers;
+  document.getElementById('v-desk').textContent   = D.desk;
+  document.getElementById('v-plag').textContent   = D.plag;
+  document.getElementById('v-inv').textContent    = D.inv;
+  document.getElementById('v-racc').textContent   = D.racc;
+  document.getElementById('v-rrej').textContent   = D.rrej;
+
+  // admin UI
+  document.getElementById('admin-btn').style.display = isAdmin ? 'none' : 'flex';
+  document.getElementById('admin-bar').className = isAdmin ? 'admin-bar show' : 'admin-bar';
+  document.getElementById('edit-sub-btn').className = isAdmin ? 'edit-sm show' : 'edit-sm';
+  document.getElementById('edit-rev-btn').className = isAdmin ? 'edit-sm show' : 'edit-sm';
+
+  // IQC cards — build DOM nodes, no innerHTML onclick
+  var grid = document.getElementById('iqc-grid');
+  grid.innerHTML = '';
+  for (var i = 0; i < D.iqc.length; i++) {
+    grid.appendChild(makeIqcCard(i));
+  }
+}
+
+function makeIqcCard(i) {
+  var m = D.iqc[i];
+  var card = document.createElement('div');
+  card.className = 'iqc-card';
+
+  var head = document.createElement('div');
+  head.className = 'iqc-head';
+
+  var nameEl = document.createElement('span');
+  nameEl.className = 'iqc-name';
+  nameEl.textContent = m.name;
+  head.appendChild(nameEl);
+
+  if (isAdmin) {
+    var eb = document.createElement('button');
+    eb.className = 'edit-sm show';
+    eb.textContent = '✏️';
+    (function(idx){ eb.addEventListener('click', function(){ openSheet(idx); }); })(i);
+    head.appendChild(eb);
+  }
+
+  var meta = document.createElement('div');
+  meta.className = 'iqc-meta';
+  meta.textContent = m.assigned + ' assigned · ' + pct(m) + '% responded';
+
+  var tbl = document.createElement('table');
+  tbl.className = 'iqc-tbl';
+
+  var rows = [
+    { icon: '✓', label: 'Accepted',    val: m.accepted, cls: 'c-acc' },
+    { icon: '✕', label: 'Rejected',    val: m.rejected, cls: 'c-rej' },
+    { icon: '!', label: 'No response', val: pend(m),    cls: 'c-pnd' }
+  ];
+  for (var r = 0; r < rows.length; r++) {
+    var tr = document.createElement('tr');
+    var td1 = document.createElement('td');
+    td1.className = 'td-lbl';
+    td1.textContent = rows[r].icon + ' ' + rows[r].label;
+    var td2 = document.createElement('td');
+    td2.className = 'td-val ' + rows[r].cls;
+    td2.textContent = rows[r].val;
+    tr.appendChild(td1);
+    tr.appendChild(td2);
+    tbl.appendChild(tr);
+  }
+
+  card.appendChild(head);
+  card.appendChild(meta);
+  card.appendChild(tbl);
+  return card;
+}
+
+// ══ AUTH ════════════════════════════════════════════════
+document.getElementById('admin-btn').addEventListener('click', function(){
+  document.getElementById('pw-overlay').classList.add('show');
+  document.getElementById('pw-input').value = '';
+  document.getElementById('pw-err').textContent = '';
+  setTimeout(function(){ document.getElementById('pw-input').focus(); }, 200);
+});
+
+document.getElementById('pw-cancel').addEventListener('click', function(){
+  document.getElementById('pw-overlay').classList.remove('show');
+});
+
+document.getElementById('pw-submit').addEventListener('click', function(){
+  if (document.getElementById('pw-input').value === PASS) {
+    isAdmin = true;
+    document.getElementById('pw-overlay').classList.remove('show');
+    render();
+  } else {
+    document.getElementById('pw-err').textContent = 'Wrong password. Try again.';
+    document.getElementById('pw-input').value = '';
+  }
+});
+
+document.getElementById('pw-input').addEventListener('keydown', function(e){
+  if (e.key === 'Enter') document.getElementById('pw-submit').click();
+});
+
+document.getElementById('logout-btn').addEventListener('click', function(){
+  isAdmin = false; render();
+});
+
+// ══ EDIT SHEET ══════════════════════════════════════════
+document.getElementById('edit-sub-btn').addEventListener('click', function(){ openSheet('sub'); });
+document.getElementById('edit-rev-btn').addEventListener('click', function(){ openSheet('rev'); });
+
+function openSheet(mode) {
+  var body = document.getElementById('sheet-body');
+  body.innerHTML = '';
+
+  var title = document.createElement('div');
+  title.className = 'sheet-title';
+
+  var fields = [];
+
+  if (mode === 'sub') {
+    title.textContent = '✏️ Update Submissions';
+    fields = [
+      { label:'Papers received', key:'papers', val:D.papers },
+      { label:'Desk rejected',   key:'desk',   val:D.desk   },
+      { label:'Plagiarism',      key:'plag',   val:D.plag   }
+    ];
+  } else if (mode === 'rev') {
+    title.textContent = '✏️ Update Reviewers';
+    fields = [
+      { label:'Invited',  key:'inv',  val:D.inv  },
+      { label:'Accepted', key:'racc', val:D.racc },
+      { label:'Rejected', key:'rrej', val:D.rrej }
+    ];
+  } else {
+    var idx = parseInt(mode);
+    var m = D.iqc[idx];
+    title.textContent = '✏️ Update ' + m.name;
+    fields = [
+      { label:'Assigned', key:'assigned', val:m.assigned },
+      { label:'Accepted', key:'accepted', val:m.accepted },
+      { label:'Rejected', key:'rejected', val:m.rejected }
+    ];
+  }
+
+  body.appendChild(title);
+
+  var inputs = {};
+  for (var f = 0; f < fields.length; f++) {
+    var er = document.createElement('div');
+    er.className = 'er';
+    var lbl = document.createElement('label');
+    lbl.textContent = fields[f].label;
+    var inp = document.createElement('input');
+    inp.type = 'number';
+    inp.min = '0';
+    inp.value = fields[f].val;
+    inputs[fields[f].key] = inp;
+    er.appendChild(lbl);
+    er.appendChild(inp);
+    body.appendChild(er);
+  }
+
+  var saveBtn = document.createElement('button');
+  saveBtn.className = 'save-btn';
+  saveBtn.textContent = 'Save';
+  saveBtn.addEventListener('click', function(){
+    if (mode === 'sub') {
+      D.papers = parseInt(inputs.papers.value) || 0;
+      D.desk   = parseInt(inputs.desk.value)   || 0;
+      D.plag   = parseInt(inputs.plag.value)   || 0;
+    } else if (mode === 'rev') {
+      D.inv  = parseInt(inputs.inv.value)  || 0;
+      D.racc = parseInt(inputs.racc.value) || 0;
+      D.rrej = parseInt(inputs.rrej.value) || 0;
+    } else {
+      var ix = parseInt(mode);
+      D.iqc[ix].assigned = parseInt(inputs.assigned.value) || 0;
+      D.iqc[ix].accepted = parseInt(inputs.accepted.value) || 0;
+      D.iqc[ix].rejected = parseInt(inputs.rejected.value) || 0;
+    }
+    closeSheet();
+    render();
+  });
+
+  var cancelBtn = document.createElement('button');
+  cancelBtn.className = 'cancel-btn';
+  cancelBtn.textContent = 'Cancel';
+  cancelBtn.addEventListener('click', closeSheet);
+
+  body.appendChild(saveBtn);
+  body.appendChild(cancelBtn);
+  document.getElementById('sheet-wrap').classList.add('show');
+}
+
+function closeSheet(){
+  document.getElementById('sheet-wrap').classList.remove('show');
+}
+
+// ══ INIT ════════════════════════════════════════════════
+render();
+</script>
+</body>
+</html>
